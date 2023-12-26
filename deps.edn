@@ -1,0 +1,4 @@
+{:paths ["src"]
+ :deps  {org.clojure/data.csv {:mvn/version "1.0.1"}}
+ :aliases 
+ {:neil {:project {:name anki-match-to-multiple-choice/anki-match-to-multiple-choice}}}}
