@@ -24,24 +24,27 @@
              (fn [idx itm]
                [idx itm])
              $)
-          #_#_q->answer (into {} matches-seq)
+          q->answer (into {} matches-seq)
           #_#_answer->q (->> matches-seq
                          (map
                           (fn [[left right]]
                             [right left]))
                          (into {}))
-          all-rights (map second matches-seq)
+          all-rights (->> matches-seq
+                          (map second)
+                          set)
 
           rows
-          (map-indexed
-           (fn [idx-by-left [itm-by-left _]]
-             (let [options
+          (map
+           (fn [[itm-by-left _]]
+             (let [answer (q->answer itm-by-left)
+                   options
                    (map-indexed
                     (fn [idx-by-right itm-by-right]
                       {#_#_:full-q (str question-prefix " - " itm-by-left)
                        #_#_:itm-by-left itm-by-left
                        :itm-by-right itm-by-right
-                       :is-answer? (= idx-by-left idx-by-right)
+                       :is-answer? (= answer itm-by-right)
                        :name (str "Q_" (inc idx-by-right))})
                     all-rights)
                    answers
@@ -57,7 +60,9 @@
                         (map (fn [{:keys [itm-by-right name]}]
                                [(keyword name) itm-by-right]))
                         (into {}))]
-               {:full-q (str question-prefix " - " itm-by-left)
+               {:full-q (if (string/blank? question-prefix)
+                          itm-by-left
+                          (str question-prefix " - " itm-by-left))
                 #_#_:options options
                 :answers answers
                 :options-as-map options-as-map
@@ -115,7 +120,7 @@
 
 (comment
 
-  (let [lines (csv-filepath->lines "test.csv")
+  (let [lines (csv-filepath->lines "in.csv")
         canon-row-maps (:rows (csv-lines->map lines))
         #_#_anki-row-maps (map row-map->anki-row-map canon-row-maps)
         csv-str (canon-row-maps->csv-str canon-row-maps)
